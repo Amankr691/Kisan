@@ -230,6 +230,21 @@ def heuristic_diagnosis(file_path):
             selected = DISEASE_KNOWLEDGE_BASE[4]
 
     return {
+        "validation_status": "passed",
+        "is_plant_image": True,
+        "validation_confidence": 0.0,
+        "visible_subject": "Plant-like image (heuristic fallback)",
+        "crop_match": True,
+        "health_status": (
+            "healthy"
+            if selected["disease_name"] == "Healthy Foliage"
+            else "diseased"
+        ),
+        "uncertain": True,
+        "reasoning_summary": (
+            "Ollama was unavailable, so a basic image-color heuristic "
+            "was used instead of full AI validation."
+        ),
         "disease_name": selected["disease_name"],
         "crop_name": selected["crop_name"],
         "confidence": selected["confidence_base"],
@@ -487,6 +502,68 @@ def diagnose_crop_disease():
     )
 
     # --------------------------------------------------------
+    # Preserve AI validation / uncertainty metadata
+    # --------------------------------------------------------
+
+    validation_status = str(
+        diagnosis.get(
+            "validation_status",
+            "passed",
+        )
+    )
+
+    is_plant_image = bool(
+        diagnosis.get(
+            "is_plant_image",
+            True,
+        )
+    )
+
+    validation_confidence = normalize_confidence(
+        diagnosis.get(
+            "validation_confidence",
+            0,
+        )
+    )
+
+    visible_subject = str(
+        diagnosis.get(
+            "visible_subject",
+            "",
+        )
+        or ""
+    )
+
+    crop_match = bool(
+        diagnosis.get(
+            "crop_match",
+            True,
+        )
+    )
+
+    health_status = str(
+        diagnosis.get(
+            "health_status",
+            "uncertain",
+        )
+    )
+
+    reasoning_summary = str(
+        diagnosis.get(
+            "reasoning_summary",
+            "",
+        )
+        or ""
+    )
+
+    uncertain = bool(
+        diagnosis.get(
+            "uncertain",
+            False,
+        )
+    )
+
+    # --------------------------------------------------------
     # Store diagnosis in database
     # --------------------------------------------------------
 
@@ -566,6 +643,27 @@ def diagnose_crop_disease():
         "youtube_tutorial_id": (
             log.youtube_tutorial_id
         ),
+
+        # Pass through validation metadata from vision_service.py.
+        # These fields are not currently stored in DiseaseLog,
+        # so they are returned directly from the in-memory diagnosis.
+        "validation_status": validation_status,
+
+        "is_plant_image": is_plant_image,
+
+        "validation_confidence": (
+            validation_confidence
+        ),
+
+        "visible_subject": visible_subject,
+
+        "crop_match": crop_match,
+
+        "health_status": health_status,
+
+        "reasoning_summary": reasoning_summary,
+
+        "uncertain": uncertain,
 
         "analyzed_at": (
             log.created_at.strftime(

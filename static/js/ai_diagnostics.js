@@ -829,290 +829,189 @@
   // ============================================================
 
   function renderDiagnosticReport(data) {
-    const resultCard =
-      document.getElementById(
-        "ai-result-card"
-      );
-
-    if (!resultCard) {
-      console.error(
-        "[AI Diagnostics] Result card not found."
-      );
-      return;
-    }
-
-    const diseaseNameEl =
-      document.getElementById(
-        "diag-disease-name"
-      );
-
-    const cropNameEl =
-      document.getElementById(
-        "diag-crop-name"
-      );
-
-    const confidenceEl =
-      document.getElementById(
-        "diag-confidence"
-      );
-
-    const confidenceBarEl =
-      document.getElementById(
-        "diag-confidence-bar"
-      );
-
-    const severityBadgeEl =
-      document.getElementById(
-        "diag-severity-badge"
-      );
-
-    const symptomsListEl =
-      document.getElementById(
-        "diag-symptoms-list"
-      );
-
-    const organicTreatmentEl =
-      document.getElementById(
-        "diag-organic-treatment"
-      );
-
-    const chemicalTreatmentEl =
-      document.getElementById(
-        "diag-chemical-treatment"
-      );
-
-    const videoIframeEl =
-      document.getElementById(
-        "diag-youtube-iframe"
-      );
-
-    const videoSectionEl =
-      document.getElementById(
-        "diag-video-section"
-      );
-
-    // ----------------------------------------------------------
-    // Basic values
-    // ----------------------------------------------------------
-
-    const diseaseName =
-      data.disease_name ||
-      "Unknown Condition";
-
-    /*
-     * Prefer the crop returned by the backend.
-     * If it is missing, fall back to the crop
-     * currently selected by the user.
-     */
-    const cropName =
-      data.crop_name ||
-      selectedCropName ||
-      getSelectedCropName() ||
-      "Unknown Crop";
-
-    let confidence =
-      Number(data.confidence);
-
-    if (Number.isNaN(confidence)) {
-      confidence = 0;
-    }
-
-    confidence = Math.max(
-      0,
-      Math.min(100, confidence)
+  const resultCard =
+    document.getElementById(
+      "ai-result-card"
     );
 
-    const severity =
-      data.severity ||
-      "Unknown";
+  if (!resultCard) {
+    console.error(
+      "[AI Diagnostics] Result card not found."
+    );
+    return;
+  }
+
+  const diseaseNameEl =
+    document.getElementById(
+      "diag-disease-name"
+    );
+
+  const cropNameEl =
+    document.getElementById(
+      "diag-crop-name"
+    );
+
+  const confidenceEl =
+    document.getElementById(
+      "diag-confidence"
+    );
+
+  const confidenceBarEl =
+    document.getElementById(
+      "diag-confidence-bar"
+    );
+
+  const severityBadgeEl =
+    document.getElementById(
+      "diag-severity-badge"
+    );
+
+  const symptomsListEl =
+    document.getElementById(
+      "diag-symptoms-list"
+    );
+
+  const organicTreatmentEl =
+    document.getElementById(
+      "diag-organic-treatment"
+    );
+
+  const chemicalTreatmentEl =
+    document.getElementById(
+      "diag-chemical-treatment"
+    );
+
+  const videoIframeEl =
+    document.getElementById(
+      "diag-youtube-iframe"
+    );
+
+  const videoSectionEl =
+    document.getElementById(
+      "diag-video-section"
+    );
+
+  // ==========================================================
+  // Find parent sections
+  // ==========================================================
+
+  const symptomsSectionEl =
+    symptomsListEl
+      ? symptomsListEl.closest(".my-6")
+      : null;
+
+  const treatmentsSectionEl =
+    organicTreatmentEl
+      ? organicTreatmentEl.closest(
+          ".grid.grid-cols-1.md\\:grid-cols-2"
+        )
+      : null;
+
+  // ==========================================================
+  // NON-PLANT / INVALID IMAGE REJECTION
+  // ==========================================================
+
+  if (
+    data.validation_status === "rejected" ||
+    data.is_plant_image === false
+  ) {
+    const visibleSubject =
+      data.visible_subject ||
+      "non-plant object";
+
+    const rejectionReason =
+      data.reasoning_summary ||
+      "The uploaded image does not clearly contain plant material.";
+
+    // --------------------------------------------------------
+    // Heading
+    // --------------------------------------------------------
 
     if (diseaseNameEl) {
       diseaseNameEl.textContent =
-        diseaseName;
+        "Unable to Diagnose";
     }
+
+    // --------------------------------------------------------
+    // Selected crop
+    // --------------------------------------------------------
 
     if (cropNameEl) {
       cropNameEl.textContent =
-        `Host Crop: ${cropName}`;
+        `Selected Crop: ${
+          data.crop_name ||
+          selectedCropName ||
+          "Unknown"
+        }`;
     }
+
+    // --------------------------------------------------------
+    // Confidence
+    // --------------------------------------------------------
 
     if (confidenceEl) {
       confidenceEl.textContent =
-        `${confidence.toFixed(1)}% Confidence`;
+        "0.0% Diagnostic Confidence";
     }
 
     if (confidenceBarEl) {
       confidenceBarEl.style.width =
-        `${confidence}%`;
+        "0%";
     }
 
-    // ----------------------------------------------------------
-    // Severity badge
-    // ----------------------------------------------------------
+    // --------------------------------------------------------
+    // Invalid image badge
+    // --------------------------------------------------------
 
     if (severityBadgeEl) {
       severityBadgeEl.textContent =
-        `${severity} Severity`;
+        "INVALID IMAGE";
 
       severityBadgeEl.className =
-        "px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider border";
-
-      const severityLower =
-        severity.toLowerCase();
-
-      if (
-        severityLower === "critical"
-      ) {
-        severityBadgeEl.classList.add(
+        [
+          "px-3",
+          "py-1",
+          "text-xs",
+          "font-bold",
+          "rounded-full",
+          "uppercase",
+          "tracking-wider",
+          "border",
           "bg-red-500/20",
           "text-red-400",
-          "border-red-500/40"
-        );
-      } else if (
-        severityLower === "high"
-      ) {
-        severityBadgeEl.classList.add(
-          "bg-orange-500/20",
-          "text-orange-400",
-          "border-orange-500/40"
-        );
-      } else if (
-        severityLower === "medium"
-      ) {
-        severityBadgeEl.classList.add(
-          "bg-amber-500/20",
-          "text-amber-400",
-          "border-amber-500/40"
-        );
-      } else {
-        severityBadgeEl.classList.add(
-          "bg-emerald-500/20",
-          "text-emerald-400",
-          "border-emerald-500/40"
-        );
-      }
+          "border-red-500/40",
+        ].join(" ");
     }
 
-    // ----------------------------------------------------------
-    // Symptoms
-    // ----------------------------------------------------------
+    // --------------------------------------------------------
+    // Hide disease-specific sections
+    // --------------------------------------------------------
 
-    if (symptomsListEl) {
-      symptomsListEl.innerHTML = "";
-
-      const symptoms =
-        Array.isArray(data.symptoms)
-          ? data.symptoms
-          : [];
-
-      if (symptoms.length === 0) {
-        const item =
-          document.createElement("li");
-
-        item.className =
-          "text-xs text-slate-400";
-
-        item.textContent =
-          "No specific symptoms were returned.";
-
-        symptomsListEl.appendChild(
-          item
-        );
-      } else {
-        symptoms.forEach(
-          (symptom) => {
-            const item =
-              document.createElement(
-                "li"
-              );
-
-            item.className =
-              "flex items-start gap-2 text-xs text-slate-300";
-
-            const icon =
-              document.createElement(
-                "span"
-              );
-
-            icon.className =
-              "text-emerald-400 shrink-0 mt-0.5";
-
-            icon.textContent = "✓";
-
-            const text =
-              document.createElement(
-                "span"
-              );
-
-            text.textContent =
-              String(symptom);
-
-            item.appendChild(icon);
-            item.appendChild(text);
-
-            symptomsListEl.appendChild(
-              item
-            );
-          }
-        );
-      }
+    if (symptomsSectionEl) {
+      symptomsSectionEl.classList.add(
+        "hidden"
+      );
     }
 
-    // ----------------------------------------------------------
-    // Treatments
-    // ----------------------------------------------------------
-
-    if (organicTreatmentEl) {
-      organicTreatmentEl.textContent =
-        data.organic_treatment ||
-        "No organic treatment recommendation was returned.";
+    if (treatmentsSectionEl) {
+      treatmentsSectionEl.classList.add(
+        "hidden"
+      );
     }
 
-    if (chemicalTreatmentEl) {
-      chemicalTreatmentEl.textContent =
-        data.chemical_treatment ||
-        "Consult a qualified agricultural expert before applying chemicals.";
+    if (videoSectionEl) {
+      videoSectionEl.classList.add(
+        "hidden"
+      );
     }
-
-    // ----------------------------------------------------------
-    // YouTube tutorial
-    // ----------------------------------------------------------
 
     if (videoIframeEl) {
-      if (data.youtube_tutorial_id) {
-        videoIframeEl.src =
-          `https://www.youtube.com/embed/${encodeURIComponent(
-            data.youtube_tutorial_id
-          )}`;
-
-        /*
-         * Only display the entire tutorial section
-         * if the backend actually supplied a video.
-         */
-        if (videoSectionEl) {
-          videoSectionEl.classList.remove(
-            "hidden"
-          );
-        }
-      } else {
-        videoIframeEl.src = "";
-
-        /*
-         * No tutorial ID was returned.
-         * Hide the section instead of displaying
-         * an empty black iframe.
-         */
-        if (videoSectionEl) {
-          videoSectionEl.classList.add(
-            "hidden"
-          );
-        }
-      }
+      videoIframeEl.src = "";
     }
 
-    // ----------------------------------------------------------
-    // Show result
-    // ----------------------------------------------------------
+    // --------------------------------------------------------
+    // Show result card
+    // --------------------------------------------------------
 
     resultCard.classList.remove(
       "hidden"
@@ -1123,41 +1022,399 @@
       block: "nearest",
     });
 
-    console.log(
-      "[AI Diagnostics] Result rendered.",
+    // --------------------------------------------------------
+    // User notification
+    // --------------------------------------------------------
+
+    showToast(
+      `Image rejected: ${visibleSubject}. ${rejectionReason}`,
+      "warning"
+    );
+
+    console.warn(
+      "[AI Diagnostics] Non-plant image rejected:",
       {
-        disease:
-          diseaseName,
+        subject:
+          visibleSubject,
 
-        crop:
-          cropName,
+        reason:
+          rejectionReason,
 
-        confidence:
-          confidence,
-
-        severity:
-          severity,
-
-        source:
-          data.analysis_source,
+        validationConfidence:
+          data.validation_confidence,
       }
     );
 
+    /*
+     * IMPORTANT:
+     * Stop here.
+     *
+     * We must not continue into normal disease
+     * rendering for an invalid image.
+     */
+    return;
+  }
+
+  // ==========================================================
+  // RESTORE SECTIONS FOR A VALID PLANT IMAGE
+  // ==========================================================
+
+  /*
+   * A previous scan may have been an invalid object.
+   *
+   * Those sections were hidden during that rejection.
+   * Restore them before displaying the next genuine
+   * plant diagnosis.
+   */
+
+  if (symptomsSectionEl) {
+    symptomsSectionEl.classList.remove(
+      "hidden"
+    );
+  }
+
+  if (treatmentsSectionEl) {
+    treatmentsSectionEl.classList.remove(
+      "hidden"
+    );
+  }
+
+  // Video remains hidden unless a video ID exists.
+  if (videoSectionEl) {
+    videoSectionEl.classList.add(
+      "hidden"
+    );
+  }
+
+  // ==========================================================
+  // BASIC VALUES
+  // ==========================================================
+
+  const diseaseName =
+    data.disease_name ||
+    "Unknown Condition";
+
+  /*
+   * Prefer the crop returned by the backend.
+   *
+   * Otherwise use the crop selected in the UI.
+   */
+
+  const cropName =
+    data.crop_name ||
+    selectedCropName ||
+    getSelectedCropName() ||
+    "Unknown Crop";
+
+  let confidence =
+    Number(data.confidence);
+
+  if (Number.isNaN(confidence)) {
+    confidence = 0;
+  }
+
+  confidence = Math.max(
+    0,
+    Math.min(
+      100,
+      confidence
+    )
+  );
+
+  const severity =
+    data.severity ||
+    "Unknown";
+
+  // ==========================================================
+  // DISEASE NAME
+  // ==========================================================
+
+  if (diseaseNameEl) {
+    diseaseNameEl.textContent =
+      diseaseName;
+  }
+
+  // ==========================================================
+  // HOST CROP
+  // ==========================================================
+
+  if (cropNameEl) {
+    cropNameEl.textContent =
+      `Host Crop: ${cropName}`;
+  }
+
+  // ==========================================================
+  // CONFIDENCE
+  // ==========================================================
+
+  if (confidenceEl) {
+    confidenceEl.textContent =
+      `${confidence.toFixed(1)}% Confidence`;
+  }
+
+  if (confidenceBarEl) {
+    confidenceBarEl.style.width =
+      `${confidence}%`;
+  }
+
+  // ==========================================================
+  // SEVERITY BADGE
+  // ==========================================================
+
+  if (severityBadgeEl) {
+    severityBadgeEl.textContent =
+      `${severity} Severity`;
+
+    severityBadgeEl.className =
+      "px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider border";
+
+    const severityLower =
+      String(
+        severity
+      ).toLowerCase();
+
     if (
-      data.analysis_source ===
-      "fallback"
+      severityLower === "critical"
     ) {
-      showToast(
-        "AI model was unavailable, so backup image analysis was used.",
-        "warning"
+      severityBadgeEl.classList.add(
+        "bg-red-500/20",
+        "text-red-400",
+        "border-red-500/40"
       );
-    } else {
-      showToast(
-        "AI diagnosis completed successfully.",
-        "success"
+    }
+
+    else if (
+      severityLower === "high"
+    ) {
+      severityBadgeEl.classList.add(
+        "bg-orange-500/20",
+        "text-orange-400",
+        "border-orange-500/40"
+      );
+    }
+
+    else if (
+      severityLower === "medium"
+    ) {
+      severityBadgeEl.classList.add(
+        "bg-amber-500/20",
+        "text-amber-400",
+        "border-amber-500/40"
+      );
+    }
+
+    else {
+      severityBadgeEl.classList.add(
+        "bg-emerald-500/20",
+        "text-emerald-400",
+        "border-emerald-500/40"
       );
     }
   }
+
+  // ==========================================================
+  // SYMPTOMS
+  // ==========================================================
+
+  if (symptomsListEl) {
+    symptomsListEl.innerHTML =
+      "";
+
+    const symptoms =
+      Array.isArray(
+        data.symptoms
+      )
+        ? data.symptoms
+        : [];
+
+    if (
+      symptoms.length === 0
+    ) {
+      const item =
+        document.createElement(
+          "li"
+        );
+
+      item.className =
+        "text-xs text-slate-400";
+
+      item.textContent =
+        "No specific symptoms were returned.";
+
+      symptomsListEl.appendChild(
+        item
+      );
+    }
+
+    else {
+      symptoms.forEach(
+        (symptom) => {
+          const item =
+            document.createElement(
+              "li"
+            );
+
+          item.className =
+            "flex items-start gap-2 text-xs text-slate-300";
+
+          const icon =
+            document.createElement(
+              "span"
+            );
+
+          icon.className =
+            "text-emerald-400 shrink-0 mt-0.5";
+
+          icon.textContent =
+            "✓";
+
+          const text =
+            document.createElement(
+              "span"
+            );
+
+          text.textContent =
+            String(
+              symptom
+            );
+
+          item.appendChild(
+            icon
+          );
+
+          item.appendChild(
+            text
+          );
+
+          symptomsListEl.appendChild(
+            item
+          );
+        }
+      );
+    }
+  }
+
+  // ==========================================================
+  // ORGANIC TREATMENT
+  // ==========================================================
+
+  if (organicTreatmentEl) {
+    organicTreatmentEl.textContent =
+      data.organic_treatment ||
+      "No organic treatment recommendation was returned.";
+  }
+
+  // ==========================================================
+  // CHEMICAL TREATMENT
+  // ==========================================================
+
+  if (chemicalTreatmentEl) {
+    chemicalTreatmentEl.textContent =
+      data.chemical_treatment ||
+      "Consult a qualified agricultural expert before applying chemicals.";
+  }
+
+  // ==========================================================
+  // YOUTUBE TUTORIAL
+  // ==========================================================
+
+  if (videoIframeEl) {
+    if (
+      data.youtube_tutorial_id
+    ) {
+      videoIframeEl.src =
+        `https://www.youtube.com/embed/${encodeURIComponent(
+          data.youtube_tutorial_id
+        )}`;
+
+      if (videoSectionEl) {
+        videoSectionEl.classList.remove(
+          "hidden"
+        );
+      }
+    }
+
+    else {
+      videoIframeEl.src =
+        "";
+
+      if (videoSectionEl) {
+        videoSectionEl.classList.add(
+          "hidden"
+        );
+      }
+    }
+  }
+
+  // ==========================================================
+  // SHOW RESULT
+  // ==========================================================
+
+  resultCard.classList.remove(
+    "hidden"
+  );
+
+  resultCard.scrollIntoView({
+    behavior: "smooth",
+    block: "nearest",
+  });
+
+  console.log(
+    "[AI Diagnostics] Result rendered.",
+    {
+      disease:
+        diseaseName,
+
+      crop:
+        cropName,
+
+      confidence:
+        confidence,
+
+      severity:
+        severity,
+
+      validationStatus:
+        data.validation_status,
+
+      plantImage:
+        data.is_plant_image,
+
+      source:
+        data.analysis_source,
+    }
+  );
+
+  // ==========================================================
+  // COMPLETION MESSAGE
+  // ==========================================================
+
+  if (
+    data.analysis_source ===
+    "fallback"
+  ) {
+    showToast(
+      "AI model was unavailable, so backup image analysis was used.",
+      "warning"
+    );
+  }
+
+  else if (
+    data.uncertain === true
+  ) {
+    showToast(
+      "The AI found the image difficult to diagnose with confidence.",
+      "warning"
+    );
+  }
+
+  else {
+    showToast(
+      "AI diagnosis completed successfully.",
+      "success"
+    );
+  }
+}
 
   // ============================================================
   // RESET INPUT
