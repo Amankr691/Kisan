@@ -18,7 +18,7 @@ from PIL import Image, ImageStat
 from extensions import db
 from models import DiseaseLog
 from ai.vision_service import diagnose_leaf
-
+from ai.crop_advisor_service import recommend_crops
 
 ai_bp = Blueprint("ai", __name__, url_prefix="/api/ai")
 
@@ -715,4 +715,154 @@ def get_diagnostic_history():
             for log in logs
         ],
 
+    }), 200
+# ============================================================
+# AI SMART CROP ADVISOR
+# ============================================================
+
+@ai_bp.route("/crop-advisor", methods=["POST"])
+def ai_crop_advisor():
+    """
+    Generate AI crop recommendations from farm conditions.
+
+    Primary system:
+        Local Ollama + Qwen2.5-VL
+    """
+
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({
+            "status": "error",
+            "error": "A valid JSON request body is required.",
+        }), 400
+
+    soil_type = str(
+        data.get("soil_type", "")
+    ).strip()
+
+    season = str(
+        data.get("season", "Auto")
+    ).strip()
+
+    water_availability = str(
+        data.get("water_availability", "")
+    ).strip()
+
+    irrigation = str(
+        data.get("irrigation", "")
+    ).strip()
+
+    priority = str(
+        data.get("priority", "Balanced")
+    ).strip()
+
+    location = str(
+        data.get("location", "Unknown")
+    ).strip()
+
+    land_size = data.get("land_size")
+
+    temperature = data.get("temperature")
+
+    humidity = data.get("humidity")
+
+    rainfall = data.get("rainfall")
+
+    # --------------------------------------------------------
+    # Required fields
+    # --------------------------------------------------------
+
+    if not soil_type:
+        return jsonify({
+            "status": "error",
+            "error": "Soil type is required.",
+        }), 400
+
+    if not water_availability:
+        return jsonify({
+            "status": "error",
+            "error": "Water availability is required.",
+        }), 400
+
+    if not irrigation:
+        return jsonify({
+            "status": "error",
+            "error": "Irrigation source is required.",
+        }), 400
+
+    # --------------------------------------------------------
+    # Run AI Crop Advisor
+    # --------------------------------------------------------
+
+    try:
+
+        current_app.logger.info(
+            "Starting AI Crop Advisor: "
+            "soil=%s season=%s water=%s priority=%s",
+            soil_type,
+            season,
+            water_availability,
+            priority,
+        )
+
+        result = recommend_crops(
+            soil_type=soil_type,
+            season=season,
+            water_availability=water_availability,
+            irrigation=irrigation,
+            land_size=land_size,
+            priority=priority,
+            location=location,
+            temperature=temperature,
+            humidity=humidity,
+            rainfall=rainfall,
+        )
+
+        current_app.logger.info(
+            "AI Crop Advisor completed with %s recommendations.",
+            len(result.get("recommendations", [])),
+        )
+
+    except Exception as exc:
+
+        current_app.logger.exception(
+            "AI Crop Advisor failed."
+        )
+
+        return jsonify({
+            "status": "error",
+            "error": (
+                "The AI Crop Advisor could not generate "
+                "recommendations."
+            ),
+            "details": str(exc),
+        }), 503
+
+    # --------------------------------------------------------
+    # Return recommendation report
+    # --------------------------------------------------------
+
+    return jsonify({
+        "status": "success",
+        "analysis_source": result.get(
+            "analysis_source",
+            "ollama-qwen2.5vl",
+        ),
+        "analysis_summary": result.get(
+            "analysis_summary",
+            "",
+        ),
+        "season_used": result.get(
+            "season_used",
+            season,
+        ),
+        "farm_context": result.get(
+            "farm_context",
+            {},
+        ),
+        "recommendations": result.get(
+            "recommendations",
+            [],
+        ),
     }), 200

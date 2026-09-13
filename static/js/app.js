@@ -201,106 +201,326 @@
   // 2. Smart Location-Based Crop & Hybrid Recommender
   // -------------------------------------------------------------
   async function triggerSmartRecommendation() {
-    const resultsContainer = document.getElementById('recommendation-results-container');
-    const btn = document.getElementById('btn-run-recommendation');
-    if (!resultsContainer) return;
+  const resultsContainer = document.getElementById('recommendation-results-container');
+  const btn = document.getElementById('btn-run-recommendation');
+  const loadingPanel = document.getElementById('crop-advisor-loading');
+  const resultsHeader = document.getElementById('crop-advisor-results-header');
+  const analysisSource = document.getElementById('crop-advisor-analysis-source');
 
-    if (btn) {
-      btn.disabled = true;
-      btn.innerHTML = `
-        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        Analyzing Climate & Soil Parameters...
-      `;
-    }
+  if (!resultsContainer) return;
 
-    const payload = {
-      temperature: window.userLocation ? window.userLocation.temperature : 25,
-      rainfall: window.userLocation ? window.userLocation.rainfall : 75,
-      soil_type: document.getElementById('soil-selector') ? document.getElementById('soil-selector').value : 'Loamy',
-      state: window.userLocation ? window.userLocation.locationName : 'Punjab',
-    };
+  const soilType = document.getElementById('soil-selector')?.value || 'Loamy';
+  const season = document.getElementById('advisor-season')?.value || 'Auto';
+  const waterAvailability = document.getElementById('advisor-water')?.value || 'Moderate';
+  const irrigation = document.getElementById('advisor-irrigation')?.value || 'Rain-fed';
+  const landSizeValue = document.getElementById('advisor-land-size')?.value;
+  const priority = document.getElementById('advisor-priority')?.value || 'Balanced';
 
-    try {
-      const resp = await fetch('/api/crops/recommend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await resp.json();
+  const payload = {
+    soil_type: soilType,
+    season: season,
+    water_availability: waterAvailability,
+    irrigation: irrigation,
+    land_size: landSizeValue ? Number(landSizeValue) : null,
+    priority: priority,
 
-      setTimeout(() => {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = 'Recalculate Recommendation';
-        }
-        renderRecommendationResults(data);
-      }, 700);
-    } catch (err) {
-      console.error(err);
-      if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = 'Recalculate Recommendation';
-      }
-    }
+    location: window.userLocation?.locationName || 'Unknown',
+
+    temperature:
+      window.userLocation?.temperature !== undefined
+        ? window.userLocation.temperature
+        : null,
+
+    humidity:
+      window.userLocation?.humidity !== undefined
+        ? window.userLocation.humidity
+        : null,
+
+    rainfall:
+      window.userLocation?.rainfall !== undefined
+        ? window.userLocation.rainfall
+        : null,
+  };
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `
+      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10"
+          stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+        </path>
+      </svg>
+      AI is analyzing your farm...
+    `;
   }
 
-  function renderRecommendationResults(data) {
-    const resultsContainer = document.getElementById('recommendation-results-container');
-    if (!resultsContainer) return;
+  if (loadingPanel) {
+    loadingPanel.classList.remove('hidden');
+  }
 
-    resultsContainer.innerHTML = '';
-    const recs = data.recommendations || [];
+  if (resultsHeader) {
+    resultsHeader.classList.add('hidden');
+  }
 
-    recs.forEach((rec, idx) => {
-      const crop = rec.crop;
-      const card = document.createElement('div');
-      card.className = 'glass-card tilt-card p-5 rounded-2xl flex flex-col justify-between border border-emerald-500/20';
+  resultsContainer.classList.add('hidden');
+  resultsContainer.innerHTML = '';
 
-      card.innerHTML = `
-        <div class="tilt-glare"></div>
-        <div class="tilt-content">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold text-emerald-400 bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-500/30">
-              Rank #${idx + 1} Best Match
-            </span>
-            <span class="text-sm font-black text-amber-400">${rec.suitability_score}% Match</span>
-          </div>
-
-          <h4 class="text-base font-bold text-white mb-1">${crop.name}</h4>
-          <p class="text-xs text-slate-300 mb-3">${rec.reasoning}</p>
-
-          <div class="bg-black/20 p-3 rounded-xl space-y-1.5 text-xs text-slate-300 mb-4">
-            <div class="flex justify-between">
-              <span class="text-slate-400">Suitable Season:</span>
-              <span class="font-semibold text-emerald-400 uppercase">${crop.season}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-slate-400">Expected Yield:</span>
-              <span class="font-semibold text-white">${crop.estimated_yield_per_acre}</span>
-            </div>
-            <div>
-              <span class="text-slate-400 block mb-1">Tailored Hybrid Varieties:</span>
-              <div class="flex flex-wrap gap-1">
-                ${rec.recommended_hybrids.map((h) => `<span class="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] rounded">${h}</span>`).join('')}
-              </div>
-            </div>
-          </div>
-
-          <button onclick="window.openCropWorkflowModal(${crop.id})" class="w-full py-2 bg-emerald-600/80 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg transition-all">
-            Farming Guide for this Hybrid
-          </button>
-        </div>
-      `;
-
-      resultsContainer.appendChild(card);
+  try {
+    const resp = await fetch('/api/ai/crop-advisor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
     });
 
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      throw new Error(
+        data.error ||
+        data.details ||
+        'AI Crop Advisor failed.'
+      );
+    }
+
+    if (analysisSource) {
+      analysisSource.textContent =
+        data.analysis_source === 'ollama-qwen2.5vl'
+          ? 'Local AI • Qwen2.5-VL'
+          : data.analysis_source || 'AI Analysis';
+    }
+
+    renderRecommendationResults(data);
+
+    if (resultsHeader) {
+      resultsHeader.classList.remove('hidden');
+    }
+
+    if (window.showToast) {
+      window.showToast(
+        'AI crop recommendations generated successfully.',
+        'success'
+      );
+    }
+
+  } catch (err) {
+    console.error('AI Crop Advisor error:', err);
+
+    resultsContainer.innerHTML = `
+      <div class="col-span-full glass-card rounded-2xl p-6 border border-red-500/30 text-center">
+        <div class="text-red-400 font-bold mb-2">
+          Unable to generate AI recommendations
+        </div>
+        <p class="text-sm text-slate-300">
+          ${err.message || 'Please try again.'}
+        </p>
+      </div>
+    `;
+
     resultsContainer.classList.remove('hidden');
-    if (window.init3DTilt) window.init3DTilt();
+
+    if (window.showToast) {
+      window.showToast(
+        err.message || 'AI Crop Advisor failed.',
+        'error'
+      );
+    }
+
+  } finally {
+    if (loadingPanel) {
+      loadingPanel.classList.add('hidden');
+    }
+
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = 'Get AI Crop Recommendations';
+    }
   }
+}
+
+  function renderRecommendationResults(data) {
+  const resultsContainer = document.getElementById('recommendation-results-container');
+  if (!resultsContainer) return;
+
+  resultsContainer.innerHTML = '';
+
+  const recs = data.recommendations || [];
+
+  if (!Array.isArray(recs) || recs.length === 0) {
+    resultsContainer.innerHTML = `
+      <div class="col-span-full glass-card rounded-2xl p-6 border border-amber-500/30 text-center">
+        <div class="text-amber-400 font-bold mb-2">
+          No recommendations available
+        </div>
+        <p class="text-sm text-slate-300">
+          The AI could not identify suitable crops from the supplied conditions.
+        </p>
+      </div>
+    `;
+
+    resultsContainer.classList.remove('hidden');
+    return;
+  }
+
+  const summaryCard = document.createElement('div');
+  summaryCard.className =
+    'col-span-full glass-card rounded-2xl p-5 border border-cyan-500/20';
+
+  summaryCard.innerHTML = `
+    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+      <div>
+        <div class="text-xs uppercase tracking-wider text-cyan-400 font-bold mb-2">
+          AI Farm Assessment
+        </div>
+
+        <p class="text-sm text-slate-300 leading-relaxed">
+          ${data.analysis_summary || 'Recommendations generated from the supplied farm conditions.'}
+        </p>
+      </div>
+
+      <div class="shrink-0">
+        <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold
+          bg-emerald-950/50 border border-emerald-500/30 text-emerald-300">
+          Season: ${data.season_used || 'Context-based'}
+        </span>
+      </div>
+    </div>
+  `;
+
+  resultsContainer.appendChild(summaryCard);
+
+  recs.forEach((rec, idx) => {
+    const card = document.createElement('div');
+
+    card.className =
+      'glass-card tilt-card p-5 rounded-2xl flex flex-col justify-between border border-emerald-500/20';
+
+    const risk = rec.risk_level || 'Moderate';
+
+    let riskClass = 'text-amber-300';
+
+    if (risk.toLowerCase() === 'low') {
+      riskClass = 'text-emerald-300';
+    } else if (risk.toLowerCase() === 'high') {
+      riskClass = 'text-red-400';
+    }
+
+    const advantages = Array.isArray(rec.key_advantages)
+      ? rec.key_advantages
+      : [];
+
+    card.innerHTML = `
+      <div class="tilt-glare"></div>
+
+      <div class="tilt-content">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold text-emerald-400 bg-emerald-950/40
+            px-2.5 py-1 rounded-full border border-emerald-500/30">
+            Rank #${rec.rank || idx + 1}
+          </span>
+
+          <span class="text-sm font-black text-amber-400">
+            ${rec.suitability_score ?? 0}% Match
+          </span>
+        </div>
+
+        <h4 class="text-lg font-bold text-white mb-2">
+          ${rec.crop_name || 'Crop'}
+        </h4>
+
+        <p class="text-xs text-slate-300 leading-relaxed mb-4">
+          ${rec.reason || ''}
+        </p>
+
+        <div class="bg-black/20 p-3 rounded-xl space-y-2 text-xs text-slate-300 mb-4">
+
+          <div class="flex justify-between gap-4">
+            <span class="text-slate-400">Season</span>
+            <span class="font-semibold text-emerald-300">
+              ${rec.season || 'Unknown'}
+            </span>
+          </div>
+
+          <div class="flex justify-between gap-4">
+            <span class="text-slate-400">Water Need</span>
+            <span class="font-semibold text-cyan-300">
+              ${rec.water_requirement || 'Unknown'}
+            </span>
+          </div>
+
+          <div class="flex justify-between gap-4">
+            <span class="text-slate-400">Crop Duration</span>
+            <span class="font-semibold text-white text-right">
+              ${rec.duration_days || 'Unknown'}
+            </span>
+          </div>
+
+          <div class="flex justify-between gap-4">
+            <span class="text-slate-400">Risk Level</span>
+            <span class="font-semibold ${riskClass}">
+              ${risk}
+            </span>
+          </div>
+
+          <div class="flex justify-between gap-4">
+            <span class="text-slate-400">Expected Yield</span>
+            <span class="font-semibold text-white text-right">
+              ${rec.expected_yield || 'Local estimate required'}
+            </span>
+          </div>
+
+        </div>
+
+        ${
+          advantages.length > 0
+            ? `
+          <div class="mb-4">
+            <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold mb-2">
+              Key Advantages
+            </div>
+
+            <div class="flex flex-wrap gap-1.5">
+              ${advantages
+                .map(
+                  (adv) => `
+                    <span class="px-2 py-1 bg-emerald-950/50
+                      border border-emerald-500/20 text-emerald-300
+                      rounded-lg text-[10px]">
+                      ${adv}
+                    </span>
+                  `
+                )
+                .join('')}
+            </div>
+          </div>
+        `
+            : ''
+        }
+
+        <div class="bg-amber-950/20 border border-amber-500/20 rounded-xl p-3">
+          <div class="text-[10px] uppercase tracking-wider text-amber-400 font-bold mb-1">
+            Important Caution
+          </div>
+
+          <p class="text-xs text-slate-300 leading-relaxed">
+            ${rec.important_caution || 'Verify local conditions before planting.'}
+          </p>
+        </div>
+      </div>
+    `;
+
+    resultsContainer.appendChild(card);
+  });
+
+  resultsContainer.classList.remove('hidden');
+
+  if (window.init3DTilt) {
+    window.init3DTilt();
+  }
+}
 
   // -------------------------------------------------------------
   // 3. Agricultural Tools & Machinery Hub
