@@ -1007,6 +1007,81 @@
               </div>
             </div>
 
+            <!-- AI Assessment / Confidence Context -->
+            <div
+              id="diag-assessment-panel"
+              class="hidden my-6 rounded-2xl border border-amber-500/20 bg-amber-950/20 p-5"
+            >
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0"
+                >
+                  <i
+                    id="diag-assessment-icon"
+                    data-lucide="brain-circuit"
+                    class="w-5 h-5 text-amber-400"
+                  ></i>
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <h4
+                      id="diag-assessment-title"
+                      class="text-sm font-bold text-amber-300"
+                    >
+                      AI Assessment
+                    </h4>
+
+                    <span
+                      id="diag-health-status-badge"
+                      class="hidden px-2.5 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider border"
+                    ></span>
+                  </div>
+
+                  <p
+                    id="diag-reasoning-summary"
+                    class="text-xs text-slate-300 leading-relaxed"
+                  ></p>
+
+                  <div
+                    id="diag-crop-mismatch-warning"
+                    class="hidden mt-3 rounded-xl border border-orange-500/30 bg-orange-950/30 p-3"
+                  >
+                    <div class="flex items-start gap-2">
+                      <i
+                        data-lucide="triangle-alert"
+                        class="w-4 h-4 text-orange-400 mt-0.5 shrink-0"
+                      ></i>
+
+                      <p class="text-xs text-orange-200 leading-relaxed">
+                        <span class="font-bold">Crop mismatch detected.</span>
+                        The uploaded plant may not match the crop you selected.
+                        Verify the crop type before relying on this diagnosis.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div
+                    id="diag-uncertain-warning"
+                    class="hidden mt-3 rounded-xl border border-amber-500/30 bg-amber-950/30 p-3"
+                  >
+                    <div class="flex items-start gap-2">
+                      <i
+                        data-lucide="circle-help"
+                        class="w-4 h-4 text-amber-400 mt-0.5 shrink-0"
+                      ></i>
+
+                      <p class="text-xs text-amber-100 leading-relaxed">
+                        <span class="font-bold">Diagnosis uncertain.</span>
+                        Try another clear, well-lit close-up of the affected area
+                        and consider expert confirmation before treatment.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Symptoms Checklist -->
             <div class="my-6">
               <h4
