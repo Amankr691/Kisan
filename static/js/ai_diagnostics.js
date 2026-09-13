@@ -5,9 +5,12 @@
  * - Image selection
  * - Drag and drop
  * - Image preview
+ * - Crop / plant selection
+ * - Custom crop name when "Other" is selected
  * - AI disease diagnosis request
  * - Ollama/Qwen result display
  * - Sample image testing
+ * - YouTube tutorial display
  * - Error handling
  */
 
@@ -39,6 +42,15 @@
     const fileInput = document.getElementById("ai-file-input");
     const analyzeBtn = document.getElementById("ai-analyze-btn");
 
+    const cropSelector =
+      document.getElementById("ai-crop-selector");
+
+    const customCropWrapper =
+      document.getElementById("ai-custom-crop-wrapper");
+
+    const customCropInput =
+      document.getElementById("ai-custom-crop-input");
+
     if (!dropzone) {
       console.error(
         "[AI Diagnostics] Element #ai-scanner-box was not found."
@@ -54,6 +66,51 @@
     }
 
     console.log("[AI Diagnostics] Initialized successfully.");
+
+    // ----------------------------------------------------------
+    // Crop selector
+    // ----------------------------------------------------------
+
+    if (cropSelector) {
+      cropSelector.addEventListener("change", () => {
+        const isOther = cropSelector.value === "Other";
+
+        if (customCropWrapper) {
+          customCropWrapper.classList.toggle(
+            "hidden",
+            !isOther
+          );
+        }
+
+        if (isOther) {
+          selectedCropName = null;
+
+          if (customCropInput) {
+            customCropInput.focus();
+          }
+        } else {
+          selectedCropName =
+            cropSelector.value || null;
+
+          if (customCropInput) {
+            customCropInput.value = "";
+          }
+        }
+      });
+    }
+
+    // ----------------------------------------------------------
+    // Custom crop input
+    // ----------------------------------------------------------
+
+    if (customCropInput) {
+      customCropInput.addEventListener("input", () => {
+        if (cropSelector?.value === "Other") {
+          selectedCropName =
+            customCropInput.value.trim() || null;
+        }
+      });
+    }
 
     // ----------------------------------------------------------
     // Drag enter / drag over
@@ -135,9 +192,20 @@
           return;
         }
 
+        const resolvedCropName =
+          getSelectedCropName();
+
+        if (!resolvedCropName) {
+          showToast(
+            "Please select the crop or plant type before analysis.",
+            "warning"
+          );
+          return;
+        }
+
         performScanAnalysis(
           selectedFile,
-          selectedCropName
+          resolvedCropName
         );
       });
     }
@@ -152,6 +220,7 @@
     sampleButtons.forEach((button) => {
       button.addEventListener("click", async () => {
         const sampleUrl = button.dataset.url;
+
         const cropName =
           button.dataset.crop || "Unknown";
 
@@ -181,6 +250,48 @@
             }
           );
 
+          // Synchronize crop selector with sample crop
+          const cropSelector =
+            document.getElementById(
+              "ai-crop-selector"
+            );
+
+          const customCropWrapper =
+            document.getElementById(
+              "ai-custom-crop-wrapper"
+            );
+
+          const customCropInput =
+            document.getElementById(
+              "ai-custom-crop-input"
+            );
+
+          if (cropSelector) {
+            const matchingOption =
+              Array.from(
+                cropSelector.options
+              ).some(
+                (option) =>
+                  option.value === cropName
+              );
+
+            if (matchingOption) {
+              cropSelector.value = cropName;
+
+              if (customCropWrapper) {
+                customCropWrapper.classList.add(
+                  "hidden"
+                );
+              }
+
+              if (customCropInput) {
+                customCropInput.value = "";
+              }
+            }
+          }
+
+          selectedCropName = cropName;
+
           const loaded = handleFileSelection(
             file,
             cropName
@@ -208,6 +319,57 @@
         }
       });
     });
+  }
+
+  // ============================================================
+  // CROP NAME RESOLUTION
+  // ============================================================
+
+  function getSelectedCropName() {
+    const cropSelector =
+      document.getElementById(
+        "ai-crop-selector"
+      );
+
+    const customCropInput =
+      document.getElementById(
+        "ai-custom-crop-input"
+      );
+
+    /*
+     * If the HTML does not contain the crop selector,
+     * fall back to the crop name already stored in state.
+     */
+    if (!cropSelector) {
+      return selectedCropName || null;
+    }
+
+    const selectedValue =
+      cropSelector.value?.trim();
+
+    /*
+     * No crop has been selected.
+     */
+    if (!selectedValue) {
+      return selectedCropName || null;
+    }
+
+    /*
+     * If "Other" is selected, use whatever the user
+     * typed into the custom crop input.
+     */
+    if (selectedValue === "Other") {
+      const customValue =
+        customCropInput?.value?.trim();
+
+      return customValue || null;
+    }
+
+    /*
+     * Otherwise return the crop selected from
+     * the dropdown.
+     */
+    return selectedValue;
   }
 
   // ============================================================
@@ -265,7 +427,9 @@
     selectedFile = file;
 
     selectedCropName =
-      cropName || null;
+      cropName ||
+      getSelectedCropName() ||
+      null;
 
     console.log(
       "[AI Diagnostics] Selected:",
@@ -311,9 +475,28 @@
         "ai-result-card"
       );
 
+    const videoSection =
+      document.getElementById(
+        "diag-video-section"
+      );
+
+    const videoIframe =
+      document.getElementById(
+        "diag-youtube-iframe"
+      );
+
     // Hide previous result
     if (resultCard) {
       resultCard.classList.add("hidden");
+    }
+
+    // Hide previous video
+    if (videoSection) {
+      videoSection.classList.add("hidden");
+    }
+
+    if (videoIframe) {
+      videoIframe.src = "";
     }
 
     // ----------------------------------------------------------
@@ -406,6 +589,31 @@
     }
 
     // ----------------------------------------------------------
+    // Resolve crop before starting analysis
+    // ----------------------------------------------------------
+
+    const resolvedCropName =
+      cropName ||
+      getSelectedCropName();
+
+    if (!resolvedCropName) {
+      if (scanStatus) {
+        scanStatus.textContent =
+          "Select Crop / Plant Type Before Analysis";
+      }
+
+      showToast(
+        "Please select the crop or plant type before analysis.",
+        "warning"
+      );
+
+      return;
+    }
+
+    selectedCropName =
+      resolvedCropName;
+
+    // ----------------------------------------------------------
     // Start scanning UI
     // ----------------------------------------------------------
 
@@ -455,7 +663,7 @@
 
     if (scanStatus) {
       scanStatus.textContent =
-        "AI is examining leaf patterns and symptoms...";
+        `AI is examining ${resolvedCropName} leaf patterns and symptoms...`;
     }
 
     // ----------------------------------------------------------
@@ -473,12 +681,16 @@
 
     formData.append(
       "crop_name",
-      cropName || "Unknown"
+      resolvedCropName
     );
 
     try {
       console.log(
-        "[AI Diagnostics] Sending image to /api/ai/diagnose..."
+        "[AI Diagnostics] Sending image to /api/ai/diagnose...",
+        {
+          crop_name: resolvedCropName,
+          file_name: file.name,
+        }
       );
 
       const response = await fetch(
@@ -541,7 +753,10 @@
           "Diagnostic Complete";
       }
 
-      // Keep short cinematic effect
+      /*
+       * Keep a short scanning effect before
+       * displaying the result.
+       */
       setTimeout(() => {
         renderDiagnosticReport(data);
       }, 500);
@@ -671,6 +886,11 @@
         "diag-youtube-iframe"
       );
 
+    const videoSectionEl =
+      document.getElementById(
+        "diag-video-section"
+      );
+
     // ----------------------------------------------------------
     // Basic values
     // ----------------------------------------------------------
@@ -679,8 +899,15 @@
       data.disease_name ||
       "Unknown Condition";
 
+    /*
+     * Prefer the crop returned by the backend.
+     * If it is missing, fall back to the crop
+     * currently selected by the user.
+     */
     const cropName =
       data.crop_name ||
+      selectedCropName ||
+      getSelectedCropName() ||
       "Unknown Crop";
 
     let confidence =
@@ -852,15 +1079,34 @@
     // ----------------------------------------------------------
 
     if (videoIframeEl) {
-      if (
-        data.youtube_tutorial_id
-      ) {
+      if (data.youtube_tutorial_id) {
         videoIframeEl.src =
           `https://www.youtube.com/embed/${encodeURIComponent(
             data.youtube_tutorial_id
           )}`;
+
+        /*
+         * Only display the entire tutorial section
+         * if the backend actually supplied a video.
+         */
+        if (videoSectionEl) {
+          videoSectionEl.classList.remove(
+            "hidden"
+          );
+        }
       } else {
         videoIframeEl.src = "";
+
+        /*
+         * No tutorial ID was returned.
+         * Hide the section instead of displaying
+         * an empty black iframe.
+         */
+        if (videoSectionEl) {
+          videoSectionEl.classList.add(
+            "hidden"
+          );
+        }
       }
     }
 
@@ -882,12 +1128,16 @@
       {
         disease:
           diseaseName,
+
         crop:
           cropName,
+
         confidence:
           confidence,
+
         severity:
           severity,
+
         source:
           data.analysis_source,
       }
@@ -915,7 +1165,14 @@
 
   function resetFileInput() {
     selectedFile = null;
-    selectedCropName = null;
+
+    /*
+     * Do not automatically reset the crop dropdown.
+     * This allows a farmer to scan multiple leaves
+     * from the same crop without selecting it again.
+     */
+    selectedCropName =
+      getSelectedCropName();
 
     const fileInput =
       document.getElementById(

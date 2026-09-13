@@ -850,6 +850,75 @@
               </div>
             </div>
 
+            <!-- Crop / Plant Selection -->
+            <div class="mt-6">
+              <label
+                for="ai-crop-selector"
+                class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2"
+              >
+                Crop / Plant Type
+              </label>
+
+              <select
+                id="ai-crop-selector"
+                class="w-full glass-input rounded-xl px-4 py-3 text-sm font-medium bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-emerald-400 transition-colors"
+              >
+                <option value="" selected disabled>Select the crop before analysis</option>
+                <option value="Rice">Rice / Paddy</option>
+                <option value="Wheat">Wheat</option>
+                <option value="Maize">Maize / Corn</option>
+                <option value="Potato">Potato</option>
+                <option value="Tomato">Tomato</option>
+                <option value="Mustard">Mustard</option>
+                <option value="Jute">Jute</option>
+                <option value="Sugarcane">Sugarcane</option>
+                <option value="Cotton">Cotton</option>
+                <option value="Soybean">Soybean</option>
+                <option value="Groundnut">Groundnut / Peanut</option>
+                <option value="Chickpea">Chickpea / Gram</option>
+                <option value="Lentil">Lentil</option>
+                <option value="Pea">Pea</option>
+                <option value="Brinjal">Brinjal / Eggplant</option>
+                <option value="Chilli">Chilli / Pepper</option>
+                <option value="Onion">Onion</option>
+                <option value="Garlic">Garlic</option>
+                <option value="Cabbage">Cabbage</option>
+                <option value="Cauliflower">Cauliflower</option>
+                <option value="Cucumber">Cucumber</option>
+                <option value="Okra">Okra / Lady's Finger</option>
+                <option value="Banana">Banana</option>
+                <option value="Mango">Mango</option>
+                <option value="Tea">Tea</option>
+                <option value="Other">Other / Not Listed</option>
+              </select>
+
+              <!-- Custom crop input: shown by ai_diagnostics.js only when "Other" is selected -->
+              <div id="ai-custom-crop-wrapper" class="hidden mt-3">
+                <label
+                  for="ai-custom-crop-input"
+                  class="block text-xs font-semibold text-slate-300 mb-1.5"
+                >
+                  Enter Crop / Plant Name
+                </label>
+
+                <input
+                  type="text"
+                  id="ai-custom-crop-input"
+                  maxlength="80"
+                  placeholder="e.g. Papaya, Guava, Sunflower, Turmeric"
+                  class="w-full glass-input rounded-xl px-4 py-3 text-sm bg-slate-900 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition-colors"
+                />
+
+                <p class="text-[11px] text-slate-500 mt-2">
+                  Type the crop or plant name if it is not available in the list above.
+                </p>
+              </div>
+
+              <p class="text-[11px] text-slate-500 mt-2">
+                Selecting the correct crop helps the AI produce a more relevant diagnosis and treatment recommendation.
+              </p>
+            </div>
+
             <!-- Quick Test Samples & Action -->
             <div
               class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-white/10"
@@ -993,7 +1062,10 @@
             </div>
 
             <!-- Embedded YouTube Video Fix Tutorial -->
-            <div class="pt-6 border-t border-white/10">
+            <div
+              id="diag-video-section"
+              class="hidden pt-6 border-t border-white/10"
+            >
               <h4
                 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2"
               >
