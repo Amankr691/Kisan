@@ -676,45 +676,33 @@ def diagnose_crop_disease():
     }), 200
 
 
-# ============================================================
-# DIAGNOSIS HISTORY
-# ============================================================
-
 @ai_bp.route("/history", methods=["GET"])
 def get_diagnostic_history():
     """
-    Retrieve the latest crop disease diagnoses.
+    Retrieve the latest crop disease diagnoses for the signed-in user.
     """
 
     user_id = session.get("user_id")
 
-    query = DiseaseLog.query
-
-    if user_id:
-        query = query.filter_by(
-            user_id=user_id
-        )
+    if not user_id:
+        return jsonify({
+            "status": "success",
+            "count": 0,
+            "logs": [],
+        }), 200
 
     logs = (
-        query
-        .order_by(
-            DiseaseLog.created_at.desc()
-        )
+        DiseaseLog.query
+        .filter_by(user_id=user_id)
+        .order_by(DiseaseLog.created_at.desc())
         .limit(10)
         .all()
     )
 
     return jsonify({
-
         "status": "success",
-
         "count": len(logs),
-
-        "logs": [
-            log.to_dict()
-            for log in logs
-        ],
-
+        "logs": [log.to_dict() for log in logs],
     }), 200
 # ============================================================
 # AI SMART CROP ADVISOR
