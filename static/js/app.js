@@ -167,19 +167,33 @@
     }
 
     // Embed YouTube tutorial if available
-    if (videoContainer) {
-      if (crop.youtube_tutorial_id) {
-        videoContainer.innerHTML = `
-          <iframe class="w-full h-56 md:h-72 rounded-xl shadow-lg border border-white/10" 
-            src="https://www.youtube.com/embed/${crop.youtube_tutorial_id}" 
-            title="${crop.name} Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
-          </iframe>
-        `;
-        videoContainer.classList.remove('hidden');
-      } else {
-        videoContainer.classList.add('hidden');
-      }
-    }
+    // Farming tutorial link
+if (videoContainer) {
+  const youtubeSearchUrl =
+    'https://www.youtube.com/results?search_query=' +
+    encodeURIComponent(`${crop.name} farming tutorial India`);
+
+  videoContainer.innerHTML = `
+    <div class="bg-black/30 border border-white/10 rounded-xl p-5 text-center">
+      <p class="text-sm text-slate-300 mb-4">
+        Watch practical farming tutorials for ${crop.name}.
+      </p>
+
+      <a
+        href="${youtubeSearchUrl}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center justify-center gap-2 px-5 py-2.5
+               bg-red-600 hover:bg-red-500 text-white font-semibold
+               text-sm rounded-xl transition-all shadow-lg"
+      >
+        ▶ Watch Farming Tutorial on YouTube
+      </a>
+    </div>
+  `;
+
+  videoContainer.classList.remove('hidden');
+}
 
     if (modal) {
       modal.classList.remove('hidden');
@@ -576,9 +590,9 @@
             </div>
 
             <div class="p-5 pt-0 flex gap-2">
-              <button onclick="window.openVideoModal('${tool.name}', '${tool.video_demo_url}')" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shadow">
+              <button onclick="window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent('${tool.name} agricultural machinery demonstration'), '_blank', 'noopener,noreferrer')" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shadow">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                Watch 3D Demo
+                Watch Machinery Demo
               </button>
             </div>
           </div>
