@@ -160,7 +160,7 @@ def seed_database():
                 'ph_max': 7.0,
                 'hybrid_varieties': 'Pusa Basmati 1121, Pusa 1509, PR-126, Arize 6444 Gold',
                 'youtube_tutorial_id': '8mCqN_vC51I',
-                'image_url': 'https://images.unsplash.com/photo-1536617621972-602b9ce4a7d3?auto=format&fit=crop&w=800&q=80',
+                'image_url': 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
                 'estimated_yield_per_acre': '24 - 32 Quintals (Paddy), 18 - 22 (Basmati)',
                 'market_price_range': '₹2,300 - ₹4,200 per Quintal',
                 'steps': [
@@ -380,62 +380,95 @@ def seed_database():
     if Scheme.query.count() == 0:
         print("  -> Seeding government schemes & Kisan credit portals...")
         schemes_data = [
-            {
-                'title': 'PM-KISAN Samman Nidhi Yojana',
-                'category': 'central_gov',
-                'provider_name': 'Ministry of Agriculture & Farmers Welfare, Govt. of India',
-                'description': 'Direct income support of ₹6,000 per annum paid in three equal four-monthly installments of ₹2,000 directly into the Aadhaar-linked bank accounts of all landholding farmer families.',
-                'eligibility': 'All landholding farmer families with cultivable landholding in their names. Excludes institutional landholders and constitutional post holders.',
-                'benefits': '₹6,000 direct benefit transfer annually with zero intermediary deductions. 100% centrally sponsored.',
-                'interest_rate_subsidy': 'Direct Cash Grant (100% Subsidy)',
-                'application_url': 'https://pmkisan.gov.in',
-                'badge_label': 'Direct DBT'
-            },
-            {
-                'title': 'Kisan Credit Card (KCC) Concessional Loan',
-                'category': 'bank_loan',
-                'provider_name': 'NABARD, Commercial Banks & Regional Rural Banks (RRB)',
-                'description': 'Provides timely credit support from the banking system with simplified procedures for farmers for agricultural operations, post-harvest expenses, and maintenance of farm assets.',
-                'eligibility': 'All farmers, individual/joint borrowers, tenant farmers, oral lessees, sharecroppers, and SHGs/JLGs of farmers.',
-                'benefits': 'Collateral-free loan up to ₹1.60 Lakh (extendable up to ₹3.00 Lakh). Flexible repayment linked to crop harvesting season.',
-                'interest_rate_subsidy': 'Base 7% interest with 3% prompt repayment incentive -> Effective 4% p.a. interest.',
-                'application_url': 'https://sbi.co.in/web/agri-rural/agriculture-banking/kisan-credit-card-kcc',
-                'badge_label': 'Effective 4% Loan'
-            },
-            {
-                'title': 'PM Fasal Bima Yojana (PMFBY)',
-                'category': 'insurance',
-                'provider_name': 'Agricultural Insurance Company of India (AIC) & Empanelled Insurers',
-                'description': 'Comprehensive crop insurance covering failure of crop from pre-sowing to post-harvest stages due to non-preventable natural risks like drought, flood, pests, and unseasonal storms.',
-                'eligibility': 'All farmers growing notified crops in notified areas including sharecroppers and tenant farmers.',
-                'benefits': 'Full sum insured payout based on satellite and digital crop cutting experiments. Immediate mid-season adversity relief.',
-                'interest_rate_subsidy': 'Farmer pays only 2% for Kharif crops, 1.5% for Rabi crops, and 5% for commercial/horticultural crops. Balance borne by Govt.',
-                'application_url': 'https://pmfby.gov.in',
-                'badge_label': 'Crop Insurance'
-            },
-            {
-                'title': 'PM-KUSUM Solar Agricultural Pump Subsidy',
-                'category': 'subsidy',
-                'provider_name': 'Ministry of New and Renewable Energy (MNRE)',
-                'description': 'Promotes setting up of standalone solar-powered irrigation pumps and solarization of existing grid-connected agriculture pumps to liberate farmers from diesel fuel dependency.',
-                'eligibility': 'Individual farmers, farmer groups, cooperatives, and water user associations with farmland requiring irrigation pump sets.',
-                'benefits': 'Free day-time solar power for 25 years. Surplus generated power can be sold back to state DISCOM grids for extra income.',
-                'interest_rate_subsidy': '60% subsidy (30% Central + 30% State Govt) and 30% bank loan -> Farmer pays only 10% upfront cost.',
-                'application_url': 'https://pmkusum.mnre.gov.in',
-                'badge_label': '60% Solar Subsidy'
-            },
-            {
-                'title': 'Sub-Mission on Agricultural Mechanization (SMAM)',
-                'category': 'subsidy',
-                'provider_name': 'Department of Agriculture & Farmers Welfare',
-                'description': 'Subsidy assistance for procurement of modern agricultural machinery such as Combine Harvesters, Laser Land Levelers, Tractors, and Agricultural Drones.',
-                'eligibility': 'Small and marginal farmers, SC/ST, and women farmers receive highest subsidy slab preference.',
-                'benefits': 'Subsidy up to 40% to 50% on machinery purchase, or up to 80% funding for establishing Custom Hiring Centers (CHCs) in rural clusters.',
-                'interest_rate_subsidy': 'Direct machinery subsidy up to ₹5.00 Lakh per unit.',
-                'application_url': 'https://agrimachinery.nic.in',
-                'badge_label': '40-50% Subsidy'
-            }
-        ]
+    {
+        'title': 'PM-KISAN Samman Nidhi Yojana',
+        'category': 'central_gov',
+        'provider_name': 'Ministry of Agriculture & Farmers Welfare, Govt. of India',
+        'description': 'Central income-support scheme for eligible landholding farmer families across India.',
+        'eligibility': 'Eligible landholding farmer families, subject to PM-KISAN exclusion criteria and verification.',
+        'benefits': '₹6,000 per year paid directly to the beneficiary bank account in three installments.',
+        'interest_rate_subsidy': 'Direct Benefit Transfer (DBT)',
+        'application_url': 'https://pmkisan.gov.in/RegistrationFormupdated.aspx',
+        'badge_label': '₹6,000 DBT'
+    },
+    {
+        'title': 'Kisan Credit Card (KCC)',
+        'category': 'bank_loan',
+        'provider_name': 'Ministry of Agriculture & Farmers Welfare / Participating Banks',
+        'description': 'Provides timely and flexible institutional credit for cultivation, post-harvest expenses, farm assets and allied agricultural activities.',
+        'eligibility': 'Farmers and other eligible agricultural borrowers as per KCC and participating-bank guidelines.',
+        'benefits': 'Provides short-term crop credit and other eligible agricultural credit requirements through participating banks.',
+        'interest_rate_subsidy': 'Government interest subvention and prompt repayment incentive can reduce eligible short-term crop-loan interest to 4% p.a.',
+        'application_url': 'https://www.myscheme.gov.in/schemes/kcc',
+        'badge_label': 'Kisan Credit'
+    },
+    {
+        'title': 'Pradhan Mantri Fasal Bima Yojana (PMFBY)',
+        'category': 'insurance',
+        'provider_name': 'Ministry of Agriculture & Farmers Welfare',
+        'description': 'Crop insurance scheme providing financial protection against eligible crop losses caused by notified natural risks.',
+        'eligibility': 'Farmers growing notified crops in notified areas, subject to scheme and state implementation conditions.',
+        'benefits': 'Insurance protection against eligible crop losses from notified risks during the crop season.',
+        'interest_rate_subsidy': 'Farmer premium is generally capped at 2% for Kharif, 1.5% for Rabi and 5% for annual commercial/horticultural crops.',
+        'application_url': 'https://pmfby.gov.in',
+        'badge_label': 'Crop Insurance'
+    },
+    {
+        'title': 'PM-KUSUM',
+        'category': 'subsidy',
+        'provider_name': 'Ministry of New and Renewable Energy (MNRE)',
+        'description': 'Supports solar-powered agricultural pumps and solarisation of existing grid-connected agricultural pumps.',
+        'eligibility': 'Farmers and other eligible agricultural beneficiaries under applicable PM-KUSUM components and state implementation rules.',
+        'benefits': 'Financial assistance for eligible solar agricultural pump and solarisation projects.',
+        'interest_rate_subsidy': 'Subsidy structure varies by PM-KUSUM component and state implementation.',
+        'application_url': 'https://pmkusum.mnre.gov.in',
+        'badge_label': 'Solar Farming'
+    },
+    {
+        'title': 'Sub-Mission on Agricultural Mechanization (SMAM)',
+        'category': 'subsidy',
+        'provider_name': 'Department of Agriculture & Farmers Welfare',
+        'description': 'Promotes farm mechanization and access to agricultural machinery, equipment and Custom Hiring Centres.',
+        'eligibility': 'Farmers and eligible farmer groups subject to applicable machinery, subsidy and state implementation guidelines.',
+        'benefits': 'Financial assistance may be available for eligible farm machinery and mechanization activities.',
+        'interest_rate_subsidy': 'Subsidy level varies by machinery, beneficiary category and implementation guidelines.',
+        'application_url': 'https://agrimachinery.nic.in',
+        'badge_label': 'Farm Machinery'
+    },
+    {
+        'title': 'Soil Health Card Scheme',
+        'category': 'central_gov',
+        'provider_name': 'Department of Agriculture & Farmers Welfare',
+        'description': 'Provides soil-testing information to help farmers understand soil nutrient status and make better fertilizer and nutrient-management decisions.',
+        'eligibility': 'Farmers can access soil-testing and Soil Health Card services through the programme and local agricultural authorities.',
+        'benefits': 'Soil nutrient status, fertilizer recommendations and guidance for improving soil health.',
+        'interest_rate_subsidy': 'Government-supported soil testing and advisory service.',
+        'application_url': 'https://soilhealth.dac.gov.in',
+        'badge_label': 'Soil Testing'
+    },
+    {
+        'title': 'e-NAM - National Agriculture Market',
+        'category': 'central_gov',
+        'provider_name': 'Ministry of Agriculture & Farmers Welfare',
+        'description': 'National electronic agricultural-market platform connecting participating mandis to improve market access and transparent price discovery.',
+        'eligibility': 'Farmers can participate through registered e-NAM mandis and available farmer registration facilities.',
+        'benefits': 'Access to electronic trading, wider market participation and improved price discovery for agricultural produce.',
+        'interest_rate_subsidy': 'Digital agricultural marketing platform',
+        'application_url': 'https://enam.gov.in/',
+        'badge_label': 'Online Mandi'
+    },
+    {
+        'title': 'Agriculture Infrastructure Fund (AIF)',
+        'category': 'bank_loan',
+        'provider_name': 'Ministry of Agriculture & Farmers Welfare',
+        'description': 'Financing facility for eligible agriculture infrastructure and post-harvest management projects.',
+        'eligibility': 'Eligible beneficiaries include farmers, farmer groups, FPOs, cooperatives and other approved entities depending on the proposed project.',
+        'benefits': 'Eligible projects can receive financing support for agricultural infrastructure and post-harvest facilities.',
+        'interest_rate_subsidy': 'Eligible loans can receive interest-subvention support subject to current AIF guidelines.',
+        'application_url': 'https://agriinfra.dac.gov.in',
+        'badge_label': 'Agri Infrastructure'
+    }
+]
 
         for s_dict in schemes_data:
             s = Scheme(**s_dict)

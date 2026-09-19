@@ -14,7 +14,7 @@
       badge: '50% Subsidy',
       badgeColor: 'emerald',
       image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=800&q=80',
-      videoUrl: 'https://www.youtube.com/embed/ScMzIvxBSi4?autoplay=1'
+      videoUrl: 'https://www.youtube.com/embed/Dn7Q4oIrP3I?autoplay=1'
     },
     {
       title: 'Wetland Crawler Mini-Combine',
@@ -23,7 +23,7 @@
       badge: 'High Efficiency',
       badgeColor: 'amber',
       image: 'https://images.unsplash.com/photo-1595246140625-573b715d11dc?auto=format&fit=crop&w=800&q=80',
-      videoUrl: 'https://www.youtube.com/embed/fJ9rUzIMcZQ?autoplay=1'
+      videoUrl: 'https://www.youtube.com/embed/4eM6CXpGnpM?autoplay=1'
     },
     {
       title: 'IoT Solar Drip Fertigation',
@@ -32,7 +32,7 @@
       badge: '55% Subsidy',
       badgeColor: 'cyan',
       image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=800&q=80',
-      videoUrl: 'https://www.youtube.com/embed/kJQP7kiw5Fk?autoplay=1'
+      videoUrl: 'https://www.youtube.com/embed/NDyPoVWq3hE?autoplay=1'
     },
     {
       title: 'GPS Laser Land Leveling',
@@ -41,7 +41,7 @@
       badge: 'Water Saver',
       badgeColor: 'emerald',
       image: 'https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=800&q=80',
-      videoUrl: 'https://www.youtube.com/embed/J---aiyznGQ?autoplay=1'
+      videoUrl: 'https://www.youtube.com/embed/rvQ2dwuWQMk?autoplay=1'
     },
     {
       title: 'High-Density Silver Mulch Farming',
@@ -50,7 +50,7 @@
       badge: 'Bumper Yield',
       badgeColor: 'amber',
       image: 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?auto=format&fit=crop&w=800&q=80',
-      videoUrl: 'https://www.youtube.com/embed/b1hPjLhNlZc?autoplay=1'
+      videoUrl: 'https://www.youtube.com/embed/HB1y9P5i2OM?autoplay=1'
     }
   ];
 
@@ -69,7 +69,7 @@
     const angleStep = 360 / total;
     // Calculate radius based on container width
     const containerWidth = ring.parentElement.clientWidth;
-    const radius = Math.min(420, Math.max(260, containerWidth * 0.38));
+    const radius = Math.min(320, Math.max(220, containerWidth * 0.28));
 
     carouselItemsData.forEach((item, index) => {
       const cardAngle = angleStep * index;
