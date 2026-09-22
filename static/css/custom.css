@@ -222,3 +222,31 @@ body {
 .bg-radial-gradient {
   background: radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.12) 0%, rgba(9, 19, 16, 0.95) 75%);
 }
+/* Hero background video: fill the entire section */
+.hero-video-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.hero-background-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+/* Smooth transition from the hero video to the weather section */
+.hero-video-gradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 55%,
+    rgba(9, 19, 16, 0.35) 75%,
+    #091310 100%
+  );
+}
