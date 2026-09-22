@@ -168,7 +168,7 @@ def _normalize_recommendation(item, rank):
         ),
         "important_caution": _clean_text(
             item.get("important_caution"),
-            "Confirm local suitability before planting.",
+            "",
         ),
     }
 
@@ -358,8 +358,24 @@ def _validate_selected_season(
     must match it instead of copying example/schema text.
     """
     requested = str(requested_season).strip()
+    if requested.lower() == "auto":
+        season_used = str(ai_result.get("season_used", "")).strip().lower()
+        if season_used in {"", "auto", "unknown"}:
+            raise ValueError(
+                "Auto season must be resolved to an actual growing season "
+                "such as Kharif, Rabi, or Zaid. Do not return 'Auto'."
+            )
+        for recommendation in recommendations:
+            crop_season = str(recommendation.get("season", "")).strip().lower()
+            if crop_season != season_used:
+                raise ValueError(
+                    f"AI returned season '{recommendation.get('season')}' for "
+                    f"{recommendation.get('crop_name')} but season_used is "
+                    f"'{ai_result.get('season_used')}'."
+                )
+        return
 
-    if not requested or requested.lower() == "auto":
+    if not requested:
         return
 
     season_used = str(
@@ -387,6 +403,27 @@ def _validate_selected_season(
                 f"even though the farmer selected '{requested}'."
             )
 
+def _validate_known_crop_seasons(ai_result, recommendations):
+    """Reject known crop-season mismatches without restricting other crops."""
+    season_used = str(ai_result.get("season_used", "")).strip().lower()
+
+    known_crop_seasons = {
+        "chickpea": {"rabi"},
+        "chana": {"rabi"},
+        "bengal gram": {"rabi"},
+    }
+
+    for recommendation in recommendations:
+        crop_name = str(recommendation.get("crop_name", "")).strip().lower()
+
+        # Match these names exactly; do not guess about unfamiliar crops.
+        allowed_seasons = known_crop_seasons.get(crop_name)
+        if allowed_seasons and season_used not in allowed_seasons:
+            raise ValueError(
+                f"{recommendation['crop_name']} is not appropriate for "
+                f"the returned season '{season_used}'. Choose a different "
+                "crop suitable for that season."
+            )
 
 def _validate_expected_yield(recommendations):
     """Reject placeholder yield text."""
@@ -428,6 +465,13 @@ def _validate_duplicate_content(recommendations):
         str(item.get("important_caution", "")).strip().lower()
         for item in recommendations
     ]
+
+    for recommendation, caution in zip(recommendations, cautions):
+        if not caution:
+            raise ValueError(
+                f"AI did not provide a crop-specific caution for "
+                f"{recommendation.get('crop_name')}."
+            )
 
     if (
         cautions[0]
@@ -474,6 +518,12 @@ IMPORTANT RULES:
    - Each recommendation's "season" field must also match the selected
      season.
    - Never copy instructional example text into season_used.
+      - Check that each crop is actually suitable for season_used in the
+     farmer's region. Do not change a crop's usual growing season just
+     to make it match season_used.
+   - Chickpea (Chana/Bengal gram) is generally a Rabi crop in India.
+     Do NOT recommend it when season_used is Kharif. Choose a
+     genuinely Kharif-suitable crop instead.
 
 5. WATER CONSTRAINTS ARE STRICT.
 
@@ -576,6 +626,11 @@ IMPORTANT RULES:
     - Give a crop-specific caution.
 
     Avoid using the same generic caution for every crop.
+         IMPORTANT: Write a different, practical caution for EACH crop.
+     Each caution must identify a risk or management concern specific
+     to that crop. Do not repeat the same caution across all three crops.
+     Do not use "Confirm local suitability before planting" as a
+     generic caution for every crop.
 
 19. Crop-specific accuracy is more important than making every crop
     appear suitable.
@@ -721,6 +776,11 @@ def _parse_and_validate_result(
         requested_season=requested_season,
     )
 
+    _validate_known_crop_seasons(
+        ai_result=ai_result,
+        recommendations=recommendations,
+    )
+
     _validate_expected_yield(
         recommendations=recommendations,
     )
@@ -819,6 +879,17 @@ VALIDATION ERROR:
 Generate the complete JSON again from scratch.
 
 Correct the validation problem while preserving all farm constraints.
+
+If the validation error concerns missing or identical cautions:
+- First identify a real, distinct agronomic risk or management concern
+  for EACH crop under this farm's soil, season, climate and water conditions.
+- Then write one concrete, crop-specific important_caution for each crop.
+- A caution should name the crop and explain its particular concern;
+  do not repeat a generic warning or copy a caution between crops.
+- Never invent risks just to make the wording different. If a crop does
+  not fit these conditions, replace it with a genuinely suitable crop.
+- Check all three important_caution fields before returning the JSON.
+
 Do not explain the correction.
 Return ONLY the corrected JSON object.
 """
