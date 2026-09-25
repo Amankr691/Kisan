@@ -28,6 +28,7 @@ def create_app(config_name=None):
     from routes.crop_routes import crop_bp
     from routes.weather_routes import weather_bp
     from routes.ai_routes import ai_bp
+    from routes.assistant_routes import assistant_bp
     from routes.community_routes import community_bp
     from routes.tools_routes import tools_bp
     from routes.schemes_routes import schemes_bp
@@ -36,6 +37,7 @@ def create_app(config_name=None):
     app.register_blueprint(crop_bp)
     app.register_blueprint(weather_bp)
     app.register_blueprint(ai_bp)
+    app.register_blueprint(assistant_bp)
     app.register_blueprint(community_bp)
     app.register_blueprint(tools_bp)
     app.register_blueprint(schemes_bp)

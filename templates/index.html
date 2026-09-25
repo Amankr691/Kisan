@@ -103,6 +103,10 @@
           <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i> AI
           Crop Advice
         </a>
+        <a href="#ai-assistant" class="hover:text-violet-400 transition-colors flex items-center gap-1.5">
+          <i data-lucide="bot" class="w-3.5 h-3.5 text-violet-400"></i>
+          AI Assistant
+        </a>
         <a href="#crops" class="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
           <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-400"></i>
           Crop Cycles
@@ -686,6 +690,184 @@
       <div id="recommendation-results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6
       max-w-5xl mx-auto">
         <!-- AI crop recommendation cards will be rendered here -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- KISAAN AI ASSISTANT -->
+  <!-- ============================================================== -->
+  <section id="ai-assistant" class="relative py-20 z-10 border-t border-white/5 bg-slate-950/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto mb-10">
+        <div
+          class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-950/50 border border-violet-500/30 text-violet-300 text-xs font-semibold mb-3">
+          <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+          <span>Multilingual Local AI</span>
+        </div>
+
+        <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight font-['Plus_Jakarta_Sans']">
+          KISAAN AI Assistant
+        </h2>
+
+        <p class="text-sm text-slate-400 mt-3 leading-relaxed">
+          Ask agricultural questions and get assistance in your preferred language.
+        </p>
+      </div>
+
+      <!-- Mandatory Language Selection -->
+      <div id="assistant-language-panel"
+        class="glass-panel rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto border border-violet-500/20 shadow-2xl">
+
+        <div class="text-center mb-7">
+          <div
+            class="w-14 h-14 mx-auto rounded-2xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center mb-4">
+            <i data-lucide="languages" class="w-7 h-7 text-violet-300"></i>
+          </div>
+
+          <h3 class="text-xl font-bold text-white">
+            Choose your language
+          </h3>
+
+          <p class="text-sm text-slate-400 mt-2">
+            अपनी भाषा चुनें • আপনার ভাষা নির্বাচন করুন
+          </p>
+
+          <p class="text-xs text-slate-500 mt-2">
+            Select a language to start the KISAAN AI Assistant.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <button type="button" data-assistant-language="English"
+            class="assistant-language-btn group rounded-2xl border border-white/10 bg-white/5 hover:bg-violet-500/10 hover:border-violet-400/50 p-5 transition-all text-center">
+            <span class="block text-2xl mb-2">🇬🇧</span>
+            <span class="block text-sm font-bold text-white group-hover:text-violet-200">
+              English
+            </span>
+            <span class="block text-[11px] text-slate-500 mt-1">
+              Continue in English
+            </span>
+          </button>
+
+          <button type="button" data-assistant-language="Hindi"
+            class="assistant-language-btn group rounded-2xl border border-white/10 bg-white/5 hover:bg-violet-500/10 hover:border-violet-400/50 p-5 transition-all text-center">
+            <span class="block text-2xl mb-2">🇮🇳</span>
+            <span class="block text-sm font-bold text-white group-hover:text-violet-200">
+              हिन्दी
+            </span>
+            <span class="block text-[11px] text-slate-500 mt-1">
+              हिन्दी में जारी रखें
+            </span>
+          </button>
+
+          <button type="button" data-assistant-language="Bengali"
+            class="assistant-language-btn group rounded-2xl border border-white/10 bg-white/5 hover:bg-violet-500/10 hover:border-violet-400/50 p-5 transition-all text-center">
+            <span class="block text-2xl mb-2">🇮🇳</span>
+            <span class="block text-sm font-bold text-white group-hover:text-violet-200">
+              বাংলা
+            </span>
+            <span class="block text-[11px] text-slate-500 mt-1">
+              বাংলায় চালিয়ে যান
+            </span>
+          </button>
+        </div>
+
+        <div class="mt-6 flex items-start gap-3 rounded-2xl bg-violet-950/20 border border-violet-500/20 p-4">
+          <i data-lucide="shield-check" class="w-4 h-4 text-violet-300 mt-0.5 shrink-0"></i>
+          <p class="text-[11px] text-slate-400 leading-relaxed">
+            The assistant runs with KISAAN's local AI backend. A language must be selected before the chat starts.
+          </p>
+        </div>
+      </div>
+
+      <!-- Text Chat Interface: hidden until a language is selected -->
+      <div id="assistant-chat-panel"
+        class="hidden glass-panel rounded-3xl max-w-4xl mx-auto border border-violet-500/20 shadow-2xl overflow-hidden">
+
+        <div class="flex items-center justify-between gap-4 px-5 sm:px-6 py-4 border-b border-white/10 bg-slate-950/40">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center">
+              <i data-lucide="bot" class="w-5 h-5 text-violet-300"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-white">KISAAN AI Assistant</h3>
+              <p class="text-[11px] text-slate-400">
+                Language: <span id="assistant-current-language" class="font-semibold text-violet-300">English</span>
+              </p>
+            </div>
+          </div>
+
+          <button id="assistant-change-language" type="button"
+            class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-2">
+            <i data-lucide="languages" class="w-3.5 h-3.5"></i>
+            <span>Change Language</span>
+          </button>
+        </div>
+
+        <div id="assistant-messages"
+          class="h-[420px] overflow-y-auto p-5 sm:p-6 space-y-4 bg-black/10"
+          aria-live="polite"></div>
+
+        <div class="p-4 sm:p-5 border-t border-white/10 bg-slate-950/40">
+          <div id="assistant-image-preview" class="hidden mb-3">
+            <div class="inline-flex items-center gap-3 max-w-full rounded-2xl border border-violet-500/20 bg-violet-950/20 p-2.5">
+              <img id="assistant-image-preview-img" src="" alt="Selected image preview"
+                class="w-16 h-16 rounded-xl object-cover border border-white/10 bg-black" />
+              <div class="min-w-0">
+                <p id="assistant-image-name" class="text-xs font-semibold text-slate-200 truncate max-w-[220px]"></p>
+                <p class="text-[10px] text-slate-500 mt-1">JPG, JPEG, PNG or WEBP</p>
+              </div>
+              <button id="assistant-remove-image" type="button"
+                class="ml-1 p-2 rounded-xl bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 text-slate-400 hover:text-red-300 transition-all"
+                aria-label="Remove selected image" title="Remove image">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="assistant-video-preview" class="hidden mb-3">
+            <div class="inline-flex items-center gap-3 max-w-full rounded-2xl border border-violet-500/20 bg-violet-950/20 p-2.5">
+              <video id="assistant-video-preview-video" class="w-24 h-16 rounded-xl object-cover border border-white/10 bg-black" muted playsinline></video>
+              <div class="min-w-0">
+                <p id="assistant-video-name" class="text-xs font-semibold text-slate-200 truncate max-w-[220px]"></p>
+                <p class="text-[10px] text-slate-500 mt-1">MP4, MOV, WEBM or MKV</p>
+              </div>
+              <button id="assistant-remove-video" type="button"
+                class="ml-1 p-2 rounded-xl bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 text-slate-400 hover:text-red-300 transition-all"
+                aria-label="Remove selected video" title="Remove video">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <form id="assistant-chat-form" class="flex items-end gap-3">
+            <input id="assistant-image-input" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm,video/x-matroska,.mkv" class="hidden" />
+
+            <button id="assistant-image-btn" type="button"
+              class="h-12 w-12 shrink-0 rounded-2xl bg-white/5 hover:bg-violet-500/10 border border-white/10 hover:border-violet-400/40 text-slate-300 hover:text-violet-200 transition-all flex items-center justify-center"
+              title="Attach image or video" aria-label="Attach image or video">
+              <i data-lucide="paperclip" class="w-5 h-5"></i>
+            </button>
+
+            <textarea id="assistant-message-input" rows="1" maxlength="2000"
+              placeholder="Ask KISAAN AI..."
+              class="flex-1 glass-input rounded-2xl px-4 py-3 text-sm text-white bg-slate-900 border border-white/10 placeholder:text-slate-500 focus:outline-none focus:border-violet-400 resize-none"></textarea>
+
+            <button id="assistant-send-btn" type="submit"
+              class="h-12 px-5 rounded-2xl bg-gradient-to-r from-violet-600 to-emerald-600 hover:from-violet-500 hover:to-emerald-500 text-white font-bold text-sm transition-all flex items-center justify-center gap-2">
+              <i data-lucide="send" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Send</span>
+            </button>
+          </form>
+
+          <p id="assistant-chat-status" class="text-[10px] text-slate-500 mt-2 min-h-[14px]">
+            Local AI • Text + image + video chat
+          </p>
+        </div>
       </div>
 
     </div>
@@ -1528,6 +1710,249 @@
   <script src="/static/js/community.js"></script>
   <script src="/static/js/app.js"></script>
 
+  <!-- KISAAN AI Assistant: language selection + text/image/video chat -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const languagePanel = document.getElementById("assistant-language-panel");
+      const chatPanel = document.getElementById("assistant-chat-panel");
+      const languageButtons = document.querySelectorAll(".assistant-language-btn");
+      const currentLanguageLabel = document.getElementById("assistant-current-language");
+      const changeLanguageButton = document.getElementById("assistant-change-language");
+      const chatForm = document.getElementById("assistant-chat-form");
+      const messageInput = document.getElementById("assistant-message-input");
+      const messages = document.getElementById("assistant-messages");
+      const sendButton = document.getElementById("assistant-send-btn");
+      const status = document.getElementById("assistant-chat-status");
+      const imageButton = document.getElementById("assistant-image-btn");
+      const imageInput = document.getElementById("assistant-image-input");
+      const imagePreview = document.getElementById("assistant-image-preview");
+      const imagePreviewImg = document.getElementById("assistant-image-preview-img");
+      const imageName = document.getElementById("assistant-image-name");
+      const removeImageButton = document.getElementById("assistant-remove-image");
+      const videoPreview = document.getElementById("assistant-video-preview");
+      const videoPreviewVideo = document.getElementById("assistant-video-preview-video");
+      const videoName = document.getElementById("assistant-video-name");
+      const removeVideoButton = document.getElementById("assistant-remove-video");
+
+      let selectedLanguage = null;
+      let waitingForReply = false;
+      let selectedImage = null;
+      let selectedVideo = null;
+      let previewUrl = null;
+
+      const languageConfig = {
+        English: { display: "English", placeholder: "Ask KISAAN AI...", welcome: "Hello! I am KISAAN AI Assistant. Ask me your agricultural question or attach an image or video.", change: "Change Language" },
+        Hindi: { display: "हिन्दी", placeholder: "KISAAN AI से अपना सवाल पूछें...", welcome: "नमस्ते! मैं KISAAN AI Assistant हूँ। खेती से जुड़ा सवाल पूछें या कोई तस्वीर या वीडियो जोड़ें।", change: "भाषा बदलें" },
+        Bengali: { display: "বাংলা", placeholder: "KISAAN AI-কে আপনার প্রশ্ন করুন...", welcome: "নমস্কার! আমি KISAAN AI Assistant। কৃষি সম্পর্কিত প্রশ্ন করুন বা একটি ছবি বা ভিডিও যুক্ত করুন।", change: "ভাষা পরিবর্তন করুন" }
+      };
+
+      function addMessage(text, sender, imageUrl = null, videoUrl = null) {
+        const row = document.createElement("div");
+        row.className = sender === "user" ? "flex justify-end" : "flex justify-start";
+        const bubble = document.createElement("div");
+        bubble.className = sender === "user"
+          ? "max-w-[85%] sm:max-w-[75%] rounded-2xl rounded-br-md bg-violet-600 px-4 py-3 text-sm text-white whitespace-pre-wrap break-words"
+          : "max-w-[85%] sm:max-w-[75%] rounded-2xl rounded-bl-md bg-slate-800/90 border border-white/10 px-4 py-3 text-sm text-slate-100 whitespace-pre-wrap break-words";
+        if (imageUrl) {
+          const img = document.createElement("img");
+          img.src = imageUrl;
+          img.alt = "Uploaded image";
+          img.className = "max-w-full sm:max-w-[280px] max-h-56 object-contain rounded-xl border border-white/10 mb-2 bg-black/20";
+          bubble.appendChild(img);
+        }
+        if (videoUrl) {
+          const video = document.createElement("video");
+          video.src = videoUrl;
+          video.controls = true;
+          video.preload = "metadata";
+          video.className = "max-w-full sm:max-w-[320px] max-h-56 rounded-xl border border-white/10 mb-2 bg-black/20";
+          bubble.appendChild(video);
+        }
+        if (text) {
+          const textNode = document.createElement("div");
+          textNode.textContent = text;
+          bubble.appendChild(textNode);
+        }
+        row.appendChild(bubble);
+        messages.appendChild(row);
+        messages.scrollTop = messages.scrollHeight;
+      }
+
+      function showThinkingIndicator() {
+        const row = document.createElement("div");
+        row.id = "assistant-thinking-indicator";
+        row.className = "flex justify-start";
+        const bubble = document.createElement("div");
+        bubble.className = "max-w-[85%] sm:max-w-[75%] rounded-2xl rounded-bl-md bg-slate-800/90 border border-white/10 px-4 py-3 text-sm text-slate-100 flex items-center gap-3";
+        const spinner = document.createElement("span");
+        spinner.className = "inline-block w-5 h-5 rounded-full border-2 border-slate-500 border-t-violet-400 animate-spin shrink-0";
+        spinner.setAttribute("aria-hidden", "true");
+        const label = document.createElement("span");
+        label.className = "text-slate-300";
+        label.textContent = selectedLanguage === "Hindi" ? "उत्तर तैयार किया जा रहा है..." : selectedLanguage === "Bengali" ? "উত্তর তৈরি করা হচ্ছে..." : "Generating response...";
+        bubble.appendChild(spinner);
+        bubble.appendChild(label);
+        row.appendChild(bubble);
+        messages.appendChild(row);
+        messages.scrollTop = messages.scrollHeight;
+      }
+
+      function removeThinkingIndicator() {
+        const indicator = document.getElementById("assistant-thinking-indicator");
+        if (indicator) indicator.remove();
+      }
+
+      function clearSelectedAttachment() {
+        selectedImage = null;
+        selectedVideo = null;
+        imageInput.value = "";
+        imagePreview.classList.add("hidden");
+        videoPreview.classList.add("hidden");
+        imagePreviewImg.src = "";
+        videoPreviewVideo.removeAttribute("src");
+        videoPreviewVideo.load();
+        imageName.textContent = "";
+        videoName.textContent = "";
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = null;
+      }
+
+      imageButton.addEventListener("click", () => { if (!waitingForReply) imageInput.click(); });
+      imageInput.addEventListener("change", () => {
+        const file = imageInput.files && imageInput.files[0];
+        if (!file) return;
+
+        const allowedImages = ["image/jpeg", "image/png", "image/webp"];
+        const allowedVideos = ["video/mp4", "video/quicktime", "video/webm", "video/x-matroska"];
+        const isMkv = file.name.toLowerCase().endsWith(".mkv");
+
+        if (!allowedImages.includes(file.type) && !allowedVideos.includes(file.type) && !isMkv) {
+          alert("Please select a JPG, JPEG, PNG, WEBP, MP4, MOV, WEBM, or MKV file.");
+          clearSelectedAttachment();
+          return;
+        }
+
+        clearSelectedAttachment();
+        previewUrl = URL.createObjectURL(file);
+
+        if (allowedImages.includes(file.type)) {
+          selectedImage = file;
+          imagePreviewImg.src = previewUrl;
+          imageName.textContent = file.name;
+          imagePreview.classList.remove("hidden");
+        } else {
+          selectedVideo = file;
+          videoPreviewVideo.src = previewUrl;
+          videoName.textContent = file.name;
+          videoPreview.classList.remove("hidden");
+        }
+
+        if (window.lucide) window.lucide.createIcons();
+      });
+
+      removeImageButton.addEventListener("click", clearSelectedAttachment);
+      removeVideoButton.addEventListener("click", clearSelectedAttachment);
+
+      function openChat(language) {
+        selectedLanguage = language;
+        const config = languageConfig[language];
+        currentLanguageLabel.textContent = config.display;
+        messageInput.placeholder = config.placeholder;
+        changeLanguageButton.querySelector("span").textContent = config.change;
+        messages.innerHTML = "";
+        clearSelectedAttachment();
+        addMessage(config.welcome, "assistant");
+        languagePanel.classList.add("hidden");
+        chatPanel.classList.remove("hidden");
+        status.textContent = "Local AI • Text + image + video chat";
+        messageInput.focus();
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      languageButtons.forEach((button) => button.addEventListener("click", () => openChat(button.dataset.assistantLanguage)));
+      changeLanguageButton.addEventListener("click", () => {
+        selectedLanguage = null;
+        messages.innerHTML = "";
+        clearSelectedAttachment();
+        chatPanel.classList.add("hidden");
+        languagePanel.classList.remove("hidden");
+        languagePanel.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+
+      chatForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const message = messageInput.value.trim();
+        const imageToSend = selectedImage;
+        const videoToSend = selectedVideo;
+        if ((!message && !imageToSend && !videoToSend) || !selectedLanguage || waitingForReply) return;
+
+        const bubbleImageUrl = imageToSend ? URL.createObjectURL(imageToSend) : null;
+        const bubbleVideoUrl = videoToSend ? URL.createObjectURL(videoToSend) : null;
+        addMessage(message, "user", bubbleImageUrl, bubbleVideoUrl);
+        if (bubbleImageUrl) setTimeout(() => URL.revokeObjectURL(bubbleImageUrl), 1000);
+        if (bubbleVideoUrl) setTimeout(() => URL.revokeObjectURL(bubbleVideoUrl), 60000);
+        messageInput.value = "";
+        clearSelectedAttachment();
+        waitingForReply = true;
+        sendButton.disabled = true;
+        imageButton.disabled = true;
+        sendButton.classList.add("opacity-50", "cursor-not-allowed");
+        imageButton.classList.add("opacity-50", "cursor-not-allowed");
+        status.textContent = videoToSend
+          ? "KISAAN AI is analyzing the video..."
+          : imageToSend
+            ? "KISAAN AI is analyzing the image..."
+            : "KISAAN AI is thinking...";
+        showThinkingIndicator();
+
+        try {
+          let response;
+          if (videoToSend) {
+            const formData = new FormData();
+            formData.append("video", videoToSend);
+            formData.append("message", message);
+            formData.append("language", selectedLanguage);
+            response = await fetch("/api/assistant/video", { method: "POST", body: formData });
+          } else if (imageToSend) {
+            const formData = new FormData();
+            formData.append("image", imageToSend);
+            formData.append("message", message);
+            formData.append("language", selectedLanguage);
+            response = await fetch("/api/assistant/image", { method: "POST", body: formData });
+          } else {
+            response = await fetch("/api/assistant/chat", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ message, language: selectedLanguage })
+            });
+          }
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || "The assistant request failed.");
+          removeThinkingIndicator();
+          addMessage(data.response || "No response was returned.", "assistant");
+          status.textContent = "Local AI • Text + image + video chat";
+        } catch (error) {
+          removeThinkingIndicator();
+          console.error("KISAAN AI Assistant error:", error);
+          addMessage(selectedLanguage === "Hindi" ? "AI से संपर्क नहीं हो सका। कृपया सुनिश्चित करें कि Flask और Ollama चल रहे हैं।" : selectedLanguage === "Bengali" ? "AI-এর সঙ্গে সংযোগ করা যায়নি। Flask এবং Ollama চালু আছে কি না পরীক্ষা করুন।" : "Could not connect to the AI. Please make sure Flask and Ollama are running.", "assistant");
+          status.textContent = "Connection error";
+        } finally {
+          removeThinkingIndicator();
+          waitingForReply = false;
+          sendButton.disabled = false;
+          imageButton.disabled = false;
+          sendButton.classList.remove("opacity-50", "cursor-not-allowed");
+          imageButton.classList.remove("opacity-50", "cursor-not-allowed");
+          messageInput.focus();
+        }
+      });
+
+      messageInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); chatForm.requestSubmit(); }
+      });
+    });
+  </script>
+
   <!-- Lucide Icons Rendering -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -1538,4 +1963,4 @@
   </script>
 </body>
 
-</html>s
+</html>
